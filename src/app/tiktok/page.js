@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Button, Card } from "react-bootstrap";
+import { Button, Card, Spinner } from "react-bootstrap";
+
 const DownLoadTiktok = () => {
   const [url, setUrl] = useState(""); // URL người dùng nhập
   const [videoUrl, setVideoUrl] = useState({}); // Video URL
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(""); // Error message
+  const [downloading, setDownloading] = useState(false); // Downloading state
 
   const fetchVideo = async () => {
     if (!url) {
@@ -45,8 +47,11 @@ const DownLoadTiktok = () => {
       setLoading(false);
     }
   };
+
   const handleDownload = async () => {
     if (videoUrl && videoUrl.hdplay) {
+      setDownloading(true); // Start downloading process
+
       // Fetch the video data as a Blob
       try {
         const videoResponse = await fetch(videoUrl.hdplay);
@@ -55,7 +60,7 @@ const DownLoadTiktok = () => {
 
         const link = document.createElement("a");
         link.href = videoObjectUrl;
-        link.download = "tiktok_video.mp4";
+        link.download = `tiktok_video${videoObjectUrl}.mp4`;
         link.click();
 
         // Revoke the object URL after the download starts
@@ -63,6 +68,8 @@ const DownLoadTiktok = () => {
       } catch (error) {
         setError("An error occurred while downloading the video.");
         console.error("Download error:", error);
+      } finally {
+        setDownloading(false); // End downloading process
       }
     }
   };
@@ -95,7 +102,17 @@ const DownLoadTiktok = () => {
         }}
         disabled={loading}
       >
-        {loading ? "Loading..." : "Download"}
+        {loading ? (
+          <Spinner
+            as="span"
+            animation="border"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+        ) : (
+          "Fetch Video"
+        )}
       </button>
 
       {error && (
@@ -105,7 +122,7 @@ const DownLoadTiktok = () => {
       )}
 
       {videoUrl.cover && !error && (
-        <div className=" mt-5 d-flex justify-content-center">
+        <div className="mt-5 d-flex justify-content-center">
           <Card className="w-80 p-2">
             <Card.Img
               variant="top"
@@ -115,7 +132,25 @@ const DownLoadTiktok = () => {
             <Card.Body>
               <Card.Title>{videoUrl.title}</Card.Title>
             </Card.Body>
-            <Button onClick={handleDownload}>DOWNLOAD</Button>
+            <Button
+              onClick={() => {
+                if (downloading) return;
+                else handleDownload();
+              }}
+              disabled={downloading}
+            >
+              {downloading ? (
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              ) : (
+                "DOWNLOAD"
+              )}
+            </Button>
           </Card>
         </div>
       )}
