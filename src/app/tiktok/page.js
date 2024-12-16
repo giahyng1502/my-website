@@ -104,7 +104,7 @@ const DownLoadTiktok = () => {
         </div>
       )}
 
-      {videoUrl && !error && (
+      {videoUrl.cover && !error && (
         <div className="d-flex justify-content-center">
           <Card className="w-80 p-2">
             <Card.Img
