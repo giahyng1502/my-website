@@ -5,7 +5,7 @@ import QRCodeStyling from "qr-code-styling";
 import { Button, Container } from "react-bootstrap";
 
 export default function Home() {
-  const qrRef = useRef(null);
+  const qrRef = useRef<HTMLDivElement>(null);
   const [url, setUrl] = useState("");
 
   const generateQRCode = () => {
