@@ -1,10 +1,9 @@
 "use client";
 import { useState } from "react";
 import { Button, Card } from "react-bootstrap";
-
 const DownLoadTiktok = () => {
   const [url, setUrl] = useState(""); // URL người dùng nhập
-  const [videoUrl, setVideoUrl] = useState(null); // Video URL
+  const [videoUrl, setVideoUrl] = useState({}); // Video URL
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(""); // Error message
 
@@ -46,7 +45,6 @@ const DownLoadTiktok = () => {
       setLoading(false);
     }
   };
-
   const handleDownload = async () => {
     if (videoUrl && videoUrl.hdplay) {
       // Fetch the video data as a Blob
