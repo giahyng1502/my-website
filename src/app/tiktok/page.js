@@ -1,7 +1,7 @@
 "use client";
 import { ClipboardIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
-import { Button, Card, Container, Spinner } from "react-bootstrap";
+import { Button, Card, Container, Row, Spinner } from "react-bootstrap";
 const DownLoadTiktok = () => {
   const [url, setUrl] = useState(""); // URL người dùng nhập
   const [videoUrl, setVideoUrl] = useState({}); // Video URL
@@ -21,10 +21,16 @@ const DownLoadTiktok = () => {
 
     setLoading(true);
     setError(""); // Clear any previous error message
-    const apiUrl = `https://toptop.huuhuybn.workers.dev/?link=${url}`;
 
     try {
-      const response = await fetch(apiUrl);
+      const response = await fetch("/api/download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: url }),
+      });
+      console.log(response);
       const result = await response.json();
       if (result.data && result.data.hdplay) {
         setVideoUrl(result.data);
@@ -83,14 +89,24 @@ const DownLoadTiktok = () => {
       </h1>
       <div className="relative w-full">
         <button
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 "
+          style={{
+            backgroundColor: "#e0ebff",
+            height: 40,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 60,
+            borderRadius: 8,
+          }}
           onClick={() => {
             handlePaste();
           }}
         >
-          <ClipboardIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-800 h-7 w-7" />
+          <ClipboardIcon className="text-blue-700 h-6 w-7" />
         </button>
         <input
-          className="w-100 p-3 pl-10 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+          className="w-100 p-3 pl-10 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-blue-500 transition duration-300"
           type="text"
           style={{ borderRadius: 16 }}
           value={url}
