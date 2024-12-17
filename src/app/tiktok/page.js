@@ -55,41 +55,32 @@ const DownLoadTiktok = () => {
   };
   const handleDownload = async () => {
     if (videoUrl && videoUrl.hdplay) {
-      setDownloading(true); // Bắt đầu quá trình tải xuống
+      setDownloading(true); // Start downloading process
 
+      // Fetch the video data as a Blob
       try {
-        // Gửi request để lấy video stream
-        const videoResponse = await fetch(videoUrl.hdplay);
-
-        // Tạo file để lưu trữ (sử dụng File System API)
-        const fileHandle = await window.showSaveFilePicker({
-          suggestedName: "tiktok_video.mp4",
-          types: [
-            {
-              description: "MP4 Video",
-              accept: { "video/mp4": [".mp4"] },
-            },
-          ],
+        const response = await fetch("/api/down", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videoUrl: videoUrl.hdplay }),
         });
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
 
-        const writable = await fileHandle.createWritable();
-        const reader = videoResponse.body.getReader();
-
-        // Đọc dữ liệu từ stream và ghi trực tiếp vào file
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          await writable.write(value);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `video_${Date.now()}.mp4`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        } else {
+          setError("Failed to download the video.");
         }
-
-        // Đóng file sau khi ghi xong
-        await writable.close();
-        console.log("Download completed!");
       } catch (error) {
         setError("An error occurred while downloading the video.");
         console.error("Download error:", error);
       } finally {
-        setDownloading(false); // Kết thúc quá trình tải xuống
+        setDownloading(false); // End downloading process
       }
     }
   };
