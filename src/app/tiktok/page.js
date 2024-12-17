@@ -1,7 +1,7 @@
 "use client";
 import { ClipboardIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
-import { Button, Card, Container, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Container, Spinner } from "react-bootstrap";
 const DownLoadTiktok = () => {
   const [url, setUrl] = useState(""); // URL người dùng nhập
   const [videoUrl, setVideoUrl] = useState({}); // Video URL
