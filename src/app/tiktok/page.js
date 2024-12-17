@@ -55,26 +55,41 @@ const DownLoadTiktok = () => {
   };
   const handleDownload = async () => {
     if (videoUrl && videoUrl.hdplay) {
-      setDownloading(true); // Start downloading process
+      setDownloading(true); // Bắt đầu quá trình tải xuống
 
-      // Fetch the video data as a Blob
       try {
+        // Gửi request để lấy video stream
         const videoResponse = await fetch(videoUrl.hdplay);
-        const videoBlob = await videoResponse.blob();
-        const videoObjectUrl = URL.createObjectURL(videoBlob);
 
-        const link = document.createElement("a");
-        link.href = videoObjectUrl;
-        link.download = `tiktok_video${videoObjectUrl}.mp4`;
-        link.click();
+        // Tạo file để lưu trữ (sử dụng File System API)
+        const fileHandle = await window.showSaveFilePicker({
+          suggestedName: "tiktok_video.mp4",
+          types: [
+            {
+              description: "MP4 Video",
+              accept: { "video/mp4": [".mp4"] },
+            },
+          ],
+        });
 
-        // Revoke the object URL after the download starts
-        URL.revokeObjectURL(videoObjectUrl);
+        const writable = await fileHandle.createWritable();
+        const reader = videoResponse.body.getReader();
+
+        // Đọc dữ liệu từ stream và ghi trực tiếp vào file
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          await writable.write(value);
+        }
+
+        // Đóng file sau khi ghi xong
+        await writable.close();
+        console.log("Download completed!");
       } catch (error) {
         setError("An error occurred while downloading the video.");
         console.error("Download error:", error);
       } finally {
-        setDownloading(false); // End downloading process
+        setDownloading(false); // Kết thúc quá trình tải xuống
       }
     }
   };
