@@ -1,7 +1,7 @@
 "use client";
+import { ClipboardIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
-import { Button, Card, Spinner } from "react-bootstrap";
-
+import { Button, Card, Container, Spinner } from "react-bootstrap";
 const DownLoadTiktok = () => {
   const [url, setUrl] = useState(""); // URL người dùng nhập
   const [videoUrl, setVideoUrl] = useState({}); // Video URL
@@ -21,19 +21,10 @@ const DownLoadTiktok = () => {
 
     setLoading(true);
     setError(""); // Clear any previous error message
-    const apiUrl = `https://tiktok-video-no-watermark2.p.rapidapi.com/?url=${encodeURIComponent(
-      url
-    )}&hd=1`;
-    const options = {
-      method: "GET",
-      headers: {
-        "x-rapidapi-key": "b727548c78mshc383ecf5117c896p1a1ddbjsna2e2b334e9d3",
-        "x-rapidapi-host": "tiktok-video-no-watermark2.p.rapidapi.com",
-      },
-    };
+    const apiUrl = `https://toptop.huuhuybn.workers.dev/?link=${url}`;
 
     try {
-      const response = await fetch(apiUrl, options);
+      const response = await fetch(apiUrl);
       const result = await response.json();
       if (result.data && result.data.hdplay) {
         setVideoUrl(result.data);
@@ -47,7 +38,15 @@ const DownLoadTiktok = () => {
       setLoading(false);
     }
   };
-
+  const handlePaste = async () => {
+    try {
+      navigator.clipboard.readText().then((text) => {
+        setUrl(text);
+      });
+    } catch (error) {
+      console.error("Clipboard error:", error);
+    }
+  };
   const handleDownload = async () => {
     if (videoUrl && videoUrl.hdplay) {
       setDownloading(true); // Start downloading process
@@ -75,23 +74,33 @@ const DownLoadTiktok = () => {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "20px" }}>
-      <h1>Download TikTok Video</h1>
-      <input
-        type="text"
-        placeholder="Enter TikTok Video URL"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        style={{
-          width: "80%",
-          padding: "10px",
-          margin: "10px 0",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      />
+    <Container
+      className="d-flex flex-column align-items-center"
+      style={{ height: "100vh" }}
+    >
+      <h1 className="my-5" style={{ fontSize: 30 }}>
+        Download TikTok Video
+      </h1>
+      <div className="relative w-full">
+        <button
+          onClick={() => {
+            handlePaste();
+          }}
+        >
+          <ClipboardIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-800 h-7 w-7" />
+        </button>
+        <input
+          className="w-100 p-3 pl-10 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+          type="text"
+          style={{ borderRadius: 16 }}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter a URL"
+        />
+      </div>
       <button
         onClick={fetchVideo}
+        className="mt-3"
         style={{
           padding: "10px 20px",
           backgroundColor: "#007bff",
@@ -154,7 +163,7 @@ const DownLoadTiktok = () => {
           </Card>
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 
